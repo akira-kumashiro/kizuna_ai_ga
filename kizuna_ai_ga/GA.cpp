@@ -138,16 +138,14 @@ void GA::calc(bool enableDisplay, bool enableOnleLine)
 	{
 		if (data[i].result < data[minNum].result)
 			minNum = i;
-
 		/*if (data[i].result > data[maxNum].result)
 			maxNum = i;*/
-
 	}
-	if (maxData.functionValue - eliteData.functionValue > 0)
-		isChanged = true;
-
 	//評価関数が最もいいやつを保存
 	data[minNum] = eliteData;
+
+	if (searchRank(0).functionValue - eliteData.functionValue > 0)
+		isChanged = true;
 
 	calcResult();
 
