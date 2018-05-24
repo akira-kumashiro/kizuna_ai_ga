@@ -3,16 +3,12 @@
 
 GA::GA(int _max_genom_list, int _var_num, std::vector<int> _varMax, std::vector<int> _varMin, std::vector<char> _model) :
 	data(std::vector<Data>(_max_genom_list, _var_num)),//dataの初期化
-	eliteData(_var_num)/*,
-	prevElite(_var_num)*/
+	eliteData(_var_num)
 {
 	//もらった変数をクラス内変数に格納
-	//max_genom_list = _max_genom_list;
-	//var_num = _var_num;
 	model = _model;
 	varMax = _varMax;
 	varMin = _varMin;
-	//prevElite = eliteData;
 
 	for (int i = 0; i < data.size(); i++)
 	{
@@ -51,46 +47,6 @@ bool GA::selection()
 		data[i] = prev_data[j];
 	}
 	return ret;
-	/*	int max_num = 0;// , prev_max_num = 0;//最も評価の良い個体の番号
-		//bool ret = false;
-		bool ret = isChanged;
-		isChanged = false;
-
-		//calc(false);
-
-		for (int i = 0; i < data.size(); i++)//ルーレット選択用に評価関数の合計と一番評価の良い番号を取得
-		{
-			if (data[i].result > data[max_num].result)
-				max_num = i;
-			//		if (prev_data[i].result > prev_data[prev_max_num].result)
-			//			prev_max_num = i;
-		}
-		//prevElite = eliteData;
-		eliteData = data[max_num];//最も評価の良い個体を保持
-		//if (eliteData.functionValue - prevElite.functionValue != 0)//最も評価の良い個体の変化の監視(デバッグ用)
-		//	ret = true;
-		//if (data[maxNum].functionValue - prev_data[prev_max_num].functionValue > 10 * var_num)
-		//	ret = true;
-		//std::copy(data.begin(), data.end(), prev_data.begin());
-		prev_data = data;
-		for (int i = 0; i < data.size(); i++)
-		{
-			double selector = random(0.0, 1.0);//乱数を生成
-			double needle = 0;//ルーレットの針を生成
-			int j = 0;
-			for (; ; j++)
-			{
-				needle += (prev_data[j].result / resultSumValue);//ルーレットの針を乱数の値まで進める
-				if (needle > selector)
-					break;
-				if (j == (data.size() - 1))
-					break;
-			}
-			data[i] = prev_data[j];
-			//data[i].prev_pos = j;
-		}
-		//displayValues();
-		return ret;*/
 }
 
 void GA::blxAlphaCrossover()
@@ -138,8 +94,6 @@ void GA::calc(bool enableDisplay, bool enableOnleLine)
 	{
 		if (data[i].result < data[minNum].result)
 			minNum = i;
-		/*if (data[i].result > data[maxNum].result)
-			maxNum = i;*/
 	}
 	//評価関数が最もいいやつを保存
 	data[minNum] = eliteData;
@@ -156,7 +110,6 @@ void GA::calc(bool enableDisplay, bool enableOnleLine)
 void GA::calcResult(bool enableSort)
 {
 	int maxNum = 0;
-	//double seg;
 	for (int i = 0; i < data.size(); i++)
 	{
 		data[i].functionValue = 0;
@@ -168,14 +121,12 @@ void GA::calcResult(bool enableSort)
 			maxNum = i;
 
 	}
-	//double seg = data[maxNum].functionValue;//評価関数の切片を与えられた関数が最も大きいやつにセット
 	resultSumValue = 0;
 	double coefficient = 0.1 / data[0].x.size();//評価関数用の定数
 
 	for (int i = 0; i < data.size(); i++)
 	{
 		bool flag = true;
-		//double coefficient = 0.1 / data[i].x.size();//評価関数用の定数
 		for (int j = 0; j < data[i].x.size(); j++)
 		{
 			if (data[i].x[j] > varMax[j] || data[i].x[j] < varMin[j])//座標が場外にいるやつの処理
@@ -242,33 +193,6 @@ void GA::displayValues(bool enableOneLine)
 		std::cout << "\t" << std::string(data_temp[i].x_str.begin(), data_temp[i].x_str.end()) << "\t";
 		printf_s(" \t f(x,y)=%6.2lf\t Result=%6.2lf\n", data_temp[i].functionValue, data_temp[i].result);
 	}
-	/*if (enableOneLine)
-	{
-		for (int j = 0; j < data[0].x.size(); j++)
-		{
-			//printf_s("%6.2lf,", data[i].x[j]);//デバッグ用
-			printf_s("%4d,", eliteData.x[j]);
-		}
-		std::cout << "\t" << std::string(eliteData.x_str.begin(), eliteData.x_str.end()) << "\t";
-		printf_s(" \t f(x,y)=%6.2lf\t Result=%6.2lf\n", eliteData.functionValue, eliteData.result);
-	}
-	else
-	{
-		std::vector<Data> data_temp = data;
-		std::sort(data_temp.begin(), data_temp.end(), [](const Data& x, const Data& y) { return x.functionValue > y.functionValue; });
-
-		for (int i = 0; i < data.size(); i++)
-		{
-			for (int j = 0; j < data[i].x.size(); j++)
-			{
-				//printf_s("%6.2lf,", data[i].x[j]);//デバッグ用
-				printf_s("%4d,", data_temp[i].x[j]);
-			}
-			std::cout << "\t" << std::string(data_temp[i].x_str.begin(), data_temp[i].x_str.end()) << "\t";
-			printf_s(" \t f(x,y)=%6.2lf\t Result=%6.2lf\n", data_temp[i].functionValue, data_temp[i].result);
-			//printf_s(" \t f(x,y)=%d\t Result=%d\n", data[i].functionValue, data[i].result);
-		}
-	}*/
 }
 
 GA::Data GA::searchRank(int num)

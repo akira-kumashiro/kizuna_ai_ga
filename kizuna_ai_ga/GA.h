@@ -12,11 +12,8 @@
 class GA
 {
 private:
-	//int max_genom_list;//個体数
-	//int var_num;//品物の個数
 	double individualMutationRate = 0.3;//個体突然変異率
 	double genomMutationRate = 0.1;
-	//int minNum = 0, maxNum = 0;
 	double alpha = 1.0;
 	std::vector<int> varMax, varMin;
 	std::vector<char> model;
@@ -40,7 +37,7 @@ public:
 	};
 
 	std::vector<Data> data, prev_data;//操作前後で値を保持するために2個
-	Data eliteData;// , prevElite;
+	Data eliteData;
 	GA(int _max_genom_list, int _var_num, std::vector<int> _varMax, std::vector<int> _varMin, std::vector<char> _model);	//コンストラクタ
 	bool selection();//選択
 	void blxAlphaCrossover();
