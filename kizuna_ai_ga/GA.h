@@ -6,8 +6,10 @@
 #include <random>
 #include <algorithm>
 #include <cmath>
+#include <locale.h>
 
 #define __ENABLE_SINGLE_POINT_MUTATION__
+#define __ENABLE_LIGHT_WAIGHT_MODE__
 
 class GA
 {
@@ -16,7 +18,7 @@ private:
 	double genomMutationRate = 0.1;
 	double alpha = 1.0;
 	std::vector<int> varMax, varMin;
-	std::vector<char> model;
+	std::vector<_TCHAR> model;
 	bool isChanged = false;
 public:
 	double resultSumValue;//評価関数の合計
@@ -25,7 +27,8 @@ public:
 	{
 	public:
 		std::vector<int> x;//座標
-		std::vector<char> x_str;
+		//std::vector<_TCHAR> x_str;
+		std::wstring x_str;
 		double functionValue;//与えられた関数の値
 		double result;
 
@@ -38,7 +41,7 @@ public:
 
 	std::vector<Data> data, prev_data;//操作前後で値を保持するために2個
 	Data eliteData;
-	GA(int _max_genom_list, int _var_num, std::vector<int> _varMax, std::vector<int> _varMin, std::vector<char> _model);	//コンストラクタ
+	GA(int _max_genom_list, int _var_num, std::vector<int> _varMax, std::vector<int> _varMin, std::vector<_TCHAR> _model);	//コンストラクタ
 	bool selection();//選択
 	void blxAlphaCrossover();
 	void mutation();//突然変異

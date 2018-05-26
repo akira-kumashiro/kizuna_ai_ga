@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GA.h"
 
-GA::GA(int _max_genom_list, int _var_num, std::vector<int> _varMax, std::vector<int> _varMin, std::vector<char> _model) :
+GA::GA(int _max_genom_list, int _var_num, std::vector<int> _varMax, std::vector<int> _varMin, std::vector<_TCHAR> _model) :
 	data(std::vector<Data>(_max_genom_list, _var_num)),//dataの初期化
 	eliteData(_var_num)
 {
@@ -27,8 +27,9 @@ bool GA::selection()
 {
 	int max_num = 0;//最も評価の良い個体の番号
 	bool ret = isChanged;//最も評価の良い個体の変化の監視(デバッグ用)
+#ifndef __ENABLE_LIGHT_WAIGHT_MODE__
 	isChanged = false;
-
+#endif 
 	eliteData = searchRank(0);//最も評価の良い個体を保持
 	prev_data = data;
 	for (int i = 0; i < data.size(); i++)
@@ -97,10 +98,10 @@ void GA::calc(bool enableDisplay, bool enableOnleLine)
 	}
 	//評価関数が最もいいやつを保存
 	data[minNum] = eliteData;
-
+#ifndef  __ENABLE_LIGHT_WAIGHT_MODE__
 	if (searchRank(0).functionValue - eliteData.functionValue > 0)
 		isChanged = true;
-
+#endif
 	calcResult();
 
 	if (enableDisplay)
@@ -129,27 +130,42 @@ void GA::calcResult(bool enableSort)
 		bool flag = true;
 		for (int j = 0; j < data[i].x.size(); j++)
 		{
+#ifndef	__ENABLE_LIGHT_WAIGHT_MODE__
 			if (data[i].x[j] > varMax[j] || data[i].x[j] < varMin[j])//座標が場外にいるやつの処理
 			{
 				flag = false;
 				if (data[i].x[j] > varMax[j])
-					data[i].x_str[j] = (char)varMax[j];
+					data[i].x_str[j] = (_TCHAR)varMax[j];
 				else
-					data[i].x_str[j] = (char)varMin[j];
+					data[i].x_str[j] = (_TCHAR)varMin[j];
 			}
+#else
+			if (data[i].x[j] > varMax[j])
+			{
+				data[i].x_str[j] = (_TCHAR)varMax[j];
+				flag = false;
+			}
+			else if (data[i].x[j] < varMin[j])
+			{
+				data[i].x_str[j] = (_TCHAR)varMin[j];
+				flag = false;
+			}
+#endif
 			else
-				data[i].x_str[j] = (char)data[i].x[j];
+				data[i].x_str[j] = (_TCHAR)data[i].x[j];
 
 		}
-		data[i].result = data[i].functionValue == 0 ? 10 / coefficient : 1 / (data[i].functionValue*coefficient);
+		data[i].result = data[i].functionValue == 0 ? std::pow(10 / coefficient, 2.0) : std::pow(1 / (data[i].functionValue*coefficient), 2.0);
 		//data[i].result = std::pow((data[i].functionValue - seg),2.0);//与えられた関数の値から切片で設定した値を引いて2乗する→与えられた関数の値が小さいやつが強くなる
 
 		if (!flag)//場外に出たやつの処理
 			data[i].result *= coefficient;
 		resultSumValue += data[i].result;
 	}
+#ifndef __ENABLE_LIGHT_WAIGHT_MODE__
 	if (enableSort)
 		std::sort(data.begin(), data.end(), [](const Data& x, const Data& y) { return x.functionValue > y.functionValue; });
+#endif 
 }
 
 int GA::random(int min, int max)
@@ -173,12 +189,17 @@ double GA::random(double min, double max)
 
 void GA::displayValues(bool enableOneLine)
 {
+	setlocale(LC_ALL, "Japanese");
+	std::wcout.imbue(std::locale("Japanese", std::locale::ctype));
+
 	std::vector<Data> data_temp;
+#ifndef __ENABLE_LIGHT_WAIGHT_MODE__
 	if (enableOneLine)
 	{
 		data_temp.push_back(searchRank(0));
 	}
 	else
+#endif
 	{
 		data_temp = data;
 		std::sort(data_temp.begin(), data_temp.end(), [](const Data& x, const Data& y) { return x.functionValue > y.functionValue; });
@@ -188,10 +209,10 @@ void GA::displayValues(bool enableOneLine)
 	{
 		for (int j = 0; j < data_temp[i].x.size(); j++)
 		{
-			printf_s("%4d,", data_temp[i].x[j]);
+			wprintf_s(L"%4x,", data_temp[i].x[j]);
 		}
-		std::cout << "\t" << std::string(data_temp[i].x_str.begin(), data_temp[i].x_str.end()) << "\t";
-		printf_s(" \t f(x,y)=%6.2lf\t Result=%6.2lf\n", data_temp[i].functionValue, data_temp[i].result);
+		wprintf_s(L"%ls\t f(x,y)=%4.0lf \tResult=%4.0lf\n", &data_temp[i].x_str[0], data_temp[i].functionValue, data_temp[i].result);
+		//wprintf_s(L"\n");
 	}
 }
 
